@@ -32,17 +32,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-CameraView mCameraView;
+    CameraView mCameraView;
     FirebaseModelInterpreter interpreter;
     FirebaseModelInterpreterOptions options;
     FirebaseModelInputOutputOptions inputOutputOptions;
     FirebaseCustomLocalModel localModel;
-    String ans="";
+    String ans = "";
+
     @Override
     protected void onResume() {
         super.onResume();
         mCameraView.start();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -56,7 +58,7 @@ CameraView mCameraView;
         setContentView(R.layout.activity_main);
         mCameraView = findViewById(R.id.cameraview);
 
-         localModel = new FirebaseCustomLocalModel.Builder()
+        localModel = new FirebaseCustomLocalModel.Builder()
                 .setAssetFilePath("model.tflite")
                 .build();
 
@@ -81,7 +83,7 @@ CameraView mCameraView;
             @Override
             public void onImage(CameraKitImage cameraKitImage) {
                 Bitmap bitmap = cameraKitImage.getBitmap();
-                bitmap = Bitmap.createScaledBitmap(bitmap,224,224,true);
+                bitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true);
                 mCameraView.stop();
                 try {
                     classifier(bitmap);
@@ -100,13 +102,13 @@ CameraView mCameraView;
     void classifier(Bitmap bitmap) throws FirebaseMLException {
 
         try {
-             options =
+            options =
                     new FirebaseModelInterpreterOptions.Builder(localModel).build();
             interpreter = FirebaseModelInterpreter.getInstance(options);
         } catch (FirebaseMLException e) {
             // ...
         }
-         inputOutputOptions =
+        inputOutputOptions =
                 new FirebaseModelInputOutputOptions.Builder()
                         .setInputFormat(0, FirebaseModelDataType.FLOAT32, new int[]{1, 224, 224, 3})
                         .setOutputFormat(0, FirebaseModelDataType.FLOAT32, new int[]{1, 5})
@@ -150,13 +152,13 @@ CameraView mCameraView;
                                     }
                                     Log.i("MLKit", String.format("%s: %1.4f", label, probabilities[i]));
 
-                                   ans +="\n"+String.format("%s: %1.4f", label, probabilities[i]);
+                                    ans += "\n" + String.format("%s: %1.4f", label, probabilities[i]);
 
                                 }
                                 TextView tv = findViewById(R.id.textView);
                                 tv.setText("");
                                 tv.setText(ans);
-                                ans="";
+                                ans = "";
                             }
                         })
                 .addOnFailureListener(
